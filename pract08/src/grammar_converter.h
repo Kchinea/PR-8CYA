@@ -24,36 +24,22 @@
  * 
  * Pasos para la conversión a FNC:
  * 1. Eliminar símbolos inútiles
- * 2. Eliminar producciones vacías (ε)
+ * 2. Eliminar producciones vacías (&)
  * 3. Eliminar producciones unitarias
  * 4. Convertir producciones largas y mixtas (si es necesario)
  */
 class GrammarConverter {
  public:
-  /**
-   * @brief Constructor
-   * @param model Modelo de la gramática original
-   * @param debug Si true activa mensajes de depuración durante la conversión
-   */
   explicit GrammarConverter(const GrammarModel& model, bool debug = false);
   ~GrammarConverter() = default;
   GrammarData ConvertToChomskyNormalForm();
  private:
   Symbol GetNextAux(GrammarData& new_data) const;
-  std::string StringifyRhs(const std::vector<Symbol>& syms) const;
+  std::string StringifyProduction(const std::vector<Symbol>& syms) const;
   void ProcessProduction(const Production& prod, GrammarData& new_data, std::set<std::pair<Symbol, std::string>>& unique_prods) const;
-
-  // Helpers to split ProcessProduction
   bool AddUniqueProduction(const Symbol& symbolOfProduction, const std::string& production, GrammarData& new_data, std::set<std::pair<Symbol, std::string>>& unique_prods) const;
   void ReplaceTerminalsInProduction(std::vector<Symbol>& production, GrammarData& new_data, std::set<std::pair<Symbol, std::string>>& unique_prods) const;
   void HandleBinaryOrLongProduction(const Symbol& symbolOfProduction, const std::vector<Symbol>& production, GrammarData& new_data, std::set<std::pair<Symbol, std::string>>& unique_prods) const;
-
-  /**
-   * @brief Busca un no-terminal ya existente que produzca la RHS dada
-   * @param production RHS como std::string (ej. "a" o "BC")
-   * @param unique_prods Conjunto de producciones ya creadas
-   * @return Símbolo que produce production si existe, o Symbol('\0') si no existe
-   */
   Symbol FindExistingNonTerminalForProduction(const std::string& production, const std::set<std::pair<Symbol, std::string>>& unique_prods) const;
   const GrammarModel& model_;
   GrammarChecker checker_;

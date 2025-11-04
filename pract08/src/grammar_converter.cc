@@ -49,7 +49,7 @@ Symbol GrammarConverter::GetNextAux(GrammarData& new_data) const {
 }
 
 /**
- * @brief Inserta una producción (lhs -> rhs) en el conjunto unique_prods si no
+ * @brief Inserta una producción (lhs -> Production) en el conjunto unique_prods si no
  * existe ya. Si debug_ está activo imprime la producción creada.
  * @return true si la producción fue insertada (era nueva), false si ya existía
  */
@@ -68,7 +68,7 @@ bool GrammarConverter::AddUniqueProduction(const Symbol& symbolOfProduction, con
 }
 
 /**
- * @brief Reemplaza terminales en un RHS largo por no-terminales auxiliares.
+ * @brief Reemplaza terminales en un Production largo por no-terminales auxiliares.
  * Si ya existe un no-terminal que produzca el terminal, se reutiliza.
  */
 void GrammarConverter::ReplaceTerminalsInProduction(std::vector<Symbol>& production, GrammarData& new_data, std::set<std::pair<Symbol, std::string>>& unique_prods) const {
@@ -101,7 +101,7 @@ Symbol GrammarConverter::FindExistingNonTerminalForProduction(const std::string&
  */
 void GrammarConverter::HandleBinaryOrLongProduction(const Symbol& symbolOfProduction, const std::vector<Symbol>& production, GrammarData& new_data, std::set<std::pair<Symbol, std::string>>& unique_prods) const {
   if (production.size() == 2) {
-    AddUniqueProduction(symbolOfProduction, StringifyRhs(production), new_data, unique_prods);
+    AddUniqueProduction(symbolOfProduction, StringifyProduction(production), new_data, unique_prods);
     return;
   }
   std::vector<Symbol> symbols(production);
@@ -111,22 +111,22 @@ void GrammarConverter::HandleBinaryOrLongProduction(const Symbol& symbolOfProduc
     Symbol B1 = symbols[i];
     Symbol B2 = GetNextAux(new_data);
     std::vector<Symbol> pairSyms = {B1, B2};
-    AddUniqueProduction(prev_left, StringifyRhs(pairSyms), new_data, unique_prods);
+    AddUniqueProduction(prev_left, StringifyProduction(pairSyms), new_data, unique_prods);
     prev_left = B2;
   }
   if (m >= 3) {
     Symbol last1 = symbols[m-2];
     Symbol last2 = symbols[m-1];
     std::vector<Symbol> pairSyms = {last1, last2};
-    AddUniqueProduction(prev_left, StringifyRhs(pairSyms), new_data, unique_prods);
+    AddUniqueProduction(prev_left, StringifyProduction(pairSyms), new_data, unique_prods);
   }
 }
 
 /**
- * @brief Convierte un vector de Symbol en su representación plana RHS como
+ * @brief Convierte un vector de Symbol en su representación plana Production como
  * std::string (concatenando los caracteres de cada símbolo).
  */
-std::string GrammarConverter::StringifyRhs(const std::vector<Symbol>& syms) const {
+std::string GrammarConverter::StringifyProduction(const std::vector<Symbol>& syms) const {
   std::string resultString;
   for (const Symbol& sym : syms) {
     char c = sym.GetChar();
@@ -144,7 +144,7 @@ void GrammarConverter::ProcessProduction(const Production& prod, GrammarData& ne
   Symbol symbolOfProduction = prod.GetNonTerminal();
   std::vector<Symbol> production = prod.GetProduction().GetSymbols();
   if (production.empty() || (production.size() == 1 && new_data.terminals.Contains(production[0]))) {
-    AddUniqueProduction(symbolOfProduction, StringifyRhs(production), new_data, unique_prods);
+    AddUniqueProduction(symbolOfProduction, StringifyProduction(production), new_data, unique_prods);
     return;
   }
   if (production.size() >= 2) {

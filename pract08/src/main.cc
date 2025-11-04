@@ -47,8 +47,8 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   GrammarData data = parser.Parse();
-    GrammarModel model(data);
-    GrammarConverter converter(model, usage.IsDebugRequested());
+  GrammarModel model(data);
+  GrammarConverter converter(model, usage.IsDebugRequested());
   GrammarData converted_data = converter.ConvertToChomskyNormalForm();
   GrammarModel converted_model(converted_data);
   GrammarPrinter printer(converted_model, outputFile);

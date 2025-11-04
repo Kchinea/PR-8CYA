@@ -24,8 +24,6 @@ Usage::Usage(int argc, char* argv[]) {
   if (argc >= 1) {
     program_name_ = argv[0];
   }
-  
-  // Parsear argumentos: soportamos posiciones y flags (-h/--help, -d/--debug)
   std::vector<std::string> positional;
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -39,15 +37,11 @@ Usage::Usage(int argc, char* argv[]) {
       positional.push_back(arg);
     }
   }
-
-  // Verificar número correcto de argumentos posicionales (input, output)
   if (positional.size() != 2) {
     valid_ = false;
     error_message_ = "Error: Número incorrecto de argumentos. Uso: <input.gra> <output.gra> [--debug]";
     return;
   }
-
-  // Verificar que ambos archivos tengan extensión .gra
   std::string input_file = positional[0];
   std::string output_file = positional[1];
   if (!HasGraExtension(input_file)) {

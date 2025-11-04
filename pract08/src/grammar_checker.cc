@@ -116,6 +116,9 @@ bool GrammarChecker::CheckUseless(std::vector<std::string>& errors) const {
   // Alcanzables desde símbolo inicial
   std::set<Symbol> reachableFromS;
   std::vector<Symbol> non_terms = model_.GetNonTerminals().GetSymbols();
+  std::vector<Symbol> termsVector = model_.GetTerminals().GetSymbols();
+  std::set<Symbol> terms(termsVector.begin(), termsVector.end());
+  std::set<Symbol> termsReachable;
   if (!non_terms.empty()) {
     Symbol start = non_terms[0];
     reachableFromS.insert(start);
@@ -125,12 +128,21 @@ bool GrammarChecker::CheckUseless(std::vector<std::string>& errors) const {
       for (const Production& prod : model_.GetProductions()) {
         if (!reachableFromS.contains(prod.GetNonTerminal())) continue;
         for (const Symbol& symbol : prod.GetProduction().GetSymbols()) {
+          if(model_.GetNonTerminals().Contains(symbol) && !termsReachable.contains(symbol)) {
+            termsReachable.insert(symbol);
+          }
           if (model_.GetNonTerminals().Contains(symbol) && !reachableFromS.contains(symbol)) {
             reachableFromS.insert(symbol);
             reach_changed = true;
           }
         }
       }
+    }
+  }
+  std::vector<Symbol> resultNonTerms;
+  for (const Symbol& symbol : model_.GetNonTerminals().GetSymbols()) {
+    if(termsReachable.contains(symbol)) {
+      resultNonTerms.push_back(symbol);
     }
   }
   // Si existe algún no-terminal que no sea tanto reachableFromS y producesStrings, hay inútiles
@@ -142,5 +154,10 @@ bool GrammarChecker::CheckUseless(std::vector<std::string>& errors) const {
       valid = false;
     }
   }
+  std::cout << "Terminales alcanzables desde S : " << model_.GetNonTerminals().GetSymbols()[0] << " "; 
+  for ( Symbol& symbol : resultNonTerms) {
+    std::cout << symbol << " ";
+  }
+  std::cout << std::endl;
   return valid;
 }

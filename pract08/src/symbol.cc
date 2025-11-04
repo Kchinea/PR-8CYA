@@ -41,7 +41,10 @@ std::istream& operator>>(std::istream& is, Symbol& s) {
   return is;
 }
 
-// Devuelve una representación en cadena del símbolo
+/**
+ * @brief devuelve el equivalente en string a la clase Symbol
+ * @return string resultante
+ */
 std::string Symbol::ToString() const {
   if (IsEpsilon()) return std::string("&");
   return std::string(1, GetChar());
