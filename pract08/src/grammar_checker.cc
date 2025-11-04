@@ -1,4 +1,14 @@
-// Implementación de GrammarChecker
+// Universidad de La Laguna
+// Escuela Superior de Ingeniería y Tecnología
+// Grado en Ingeniería Informática
+// Asignatura: Computabilidad y Algoritmia
+// Curso: 2º
+// Práctica 8: Gramáticas - Forma Normal de Chomsky
+// Autor: Kyliam Chinea Salcedo
+// Correo: alu0101548050@ull.edu.es
+// Fecha: 03/11/2025
+// Archivo grammar_checker.cc: Implementación de GrammarChecker
+
 #include "grammar_checker.h"
 #include "production.h"
 #include <iostream>
@@ -7,6 +17,11 @@
 
 GrammarChecker::GrammarChecker(const GrammarModel& model) : model_(model) {}
 
+
+/**
+ * @brief ejecuta todos los test y comprueba que ninuno falle, termina imprimiendo los errores.
+ * @return bool de si se pasaron los test o no
+ */
 bool GrammarChecker::RunAll() {
   std::vector<std::string> errors;
   bool valid = true;
@@ -21,10 +36,18 @@ bool GrammarChecker::RunAll() {
   return valid;
 }
 
+/**
+ * @brief Test que comprueba las producciones vacias 
+ * @param errors un vector pasado por referencia al que le añadiremos posibles errores
+ * @return bool de si se paso el test o no
+ */
 bool GrammarChecker::CheckEmpty(std::vector<std::string>& errors) const {
   bool valid = true;
   for (const Production& prod : model_.GetProductions()) {
     const Cadena& body = prod.GetProduction();
+    if(prod.GetNonTerminal() == getInitial()) {
+      continue;
+    }
     if (body.Longitud() == 0) {
       std::string error = "";
       error += "Error: la producción " + prod.ToString() + " es una producción vacía; la gramática es inválida.";
@@ -35,6 +58,12 @@ bool GrammarChecker::CheckEmpty(std::vector<std::string>& errors) const {
   return valid;
 }
 
+
+/**
+ * @brief Test que comprueba las producciones unitarias 
+ * @param errors un vector pasado por referencia al que le añadiremos posibles errores
+ * @return bool de si se paso el test o no
+ */
 bool GrammarChecker::CheckUnit(std::vector<std::string>& errors) const {
   bool valid = true;
   for (const Production& prod : model_.GetProductions()) {
@@ -52,8 +81,14 @@ bool GrammarChecker::CheckUnit(std::vector<std::string>& errors) const {
   return valid;
 }
 
+/**
+ * @brief Test que comprueba las producciones inutiles 
+ * @param errors un vector pasado por referencia al que le añadiremos posibles errores
+ * @return bool de si se paso el test o no
+ */
 bool GrammarChecker::CheckUseless(std::vector<std::string>& errors) const {
   bool valid = true;
+  // productores de cadenas
   std::set<Symbol> producesStrings;
   bool changed = true;
   while (changed) {
@@ -78,7 +113,7 @@ bool GrammarChecker::CheckUseless(std::vector<std::string>& errors) const {
     }
   }
 
-  // Alcanzables: desde símbolo inicial (primer no terminal en la lista)
+  // Alcanzables desde símbolo inicial
   std::set<Symbol> reachableFromS;
   std::vector<Symbol> non_terms = model_.GetNonTerminals().GetSymbols();
   if (!non_terms.empty()) {
@@ -98,7 +133,6 @@ bool GrammarChecker::CheckUseless(std::vector<std::string>& errors) const {
       }
     }
   }
-
   // Si existe algún no-terminal que no sea tanto reachableFromS y producesStrings, hay inútiles
   for (const Symbol& symbol : model_.GetNonTerminals().GetSymbols()) {
     if (!producesStrings.contains(symbol) || !reachableFromS.contains(symbol)) {

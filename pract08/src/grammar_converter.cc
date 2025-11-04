@@ -109,7 +109,7 @@ void GrammarConverter::HandleBinaryOrLongProduction(const Symbol& symbolOfProduc
   size_t m = symbols.size();
   for (size_t i = 0; i < m - 2; ++i) {
     Symbol B1 = symbols[i];
-    Symbol B2 = (i + 1 == m - 1) ? symbols[i+1] : GetNextAux(new_data);
+    Symbol B2 = GetNextAux(new_data);
     std::vector<Symbol> pairSyms = {B1, B2};
     AddUniqueProduction(prev_left, StringifyRhs(pairSyms), new_data, unique_prods);
     prev_left = B2;
@@ -129,7 +129,6 @@ void GrammarConverter::HandleBinaryOrLongProduction(const Symbol& symbolOfProduc
 std::string GrammarConverter::StringifyRhs(const std::vector<Symbol>& syms) const {
   std::string resultString;
   for (const Symbol& sym : syms) {
-    // Prefer the single-char representation when available
     char c = sym.GetChar();
     if (c != '\0') resultString.push_back(c);
     else resultString += sym.ToString();
@@ -173,9 +172,9 @@ GrammarData GrammarConverter::ConvertToChomskyNormalForm() {
     ProcessProduction(prod, new_data, unique_prods);
   }
   for (const auto& pair : unique_prods) {
-    const std::string& rhs = pair.second;
+    const std::string& production = pair.second;
     std::vector<Symbol> syms;
-    for (char c : rhs) {
+    for (char c : production) {
       syms.push_back(Symbol(c));
     }
     new_data.productions.push_back(Production(pair.first, Cadena(syms)));

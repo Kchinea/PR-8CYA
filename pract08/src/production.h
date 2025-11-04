@@ -27,7 +27,7 @@ class Production {
   Production(const Symbol& non_terminal, const Cadena& production) : non_terminal_(non_terminal), production_(production) {}
   const Symbol& GetNonTerminal() const { return non_terminal_; }
   const Cadena& GetProduction() const { return production_; }
-  std::string ToString() const { return non_terminal_.ToString() + production_.ToString(); }
+  std::string ToString() const { return non_terminal_.ToString() + " -> " + production_.ToString(); }
   friend std::ostream& operator<<(std::ostream& os, const Production& prod) {
     os << prod.non_terminal_ << " -> " << prod.production_;
     return os;

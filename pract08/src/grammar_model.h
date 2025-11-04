@@ -28,6 +28,7 @@ class GrammarModel {
   explicit GrammarModel(const GrammarData& data);
   const Alphabet& GetTerminals() const { return terminals_; }
   const Alphabet& GetNonTerminals() const { return non_terminals_; }
+  const Symbol& getInitial() const {return productions_[0].GetNonTerminal();} 
   const std::vector<Production>& GetProductions() const { return productions_; }
  private:
   Alphabet terminals_;
